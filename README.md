@@ -25,6 +25,307 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 To learn more about Next.js, take a look at the following resources:
 
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+
+- ```mermaid
+classDiagram
+    class User {
+        +id: Int
+        +username: String
+        +email: String
+        +passwordHash: String
+        +fullName: String
+        +phoneNumber: String
+        +roleId: Int
+        +isActive: Boolean
+        +createdAt: DateTime
+        +updatedAt: DateTime
+        +login()
+        +logout()
+        +updateProfile()
+    }
+
+    class Role {
+        +id: Int
+        +name: String
+        +description: String
+        +createdAt: DateTime
+        +updatedAt: DateTime
+        +getPermissions()
+    }
+
+    class Permission {
+        +id: Int
+        +name: String
+        +description: String
+        +createdAt: DateTime
+    }
+
+    class Product {
+        +id: Int
+        +categoryId: Int
+        +name: String
+        +description: String
+        +barcode: String
+        +sku: String
+        +unitPrice: Decimal
+        +costPrice: Decimal
+        +quantity: Int
+        +minimumQuantity: Int
+        +maximumQuantity: Int
+        +supplierId: Int
+        +imageUrl: String
+        +isActive: Boolean
+        +createdAt: DateTime
+        +updatedAt: DateTime
+        +updateStock()
+        +calculateValue()
+    }
+
+    class Category {
+        +id: Int
+        +name: String
+        +description: String
+        +parentId: Int
+        +createdAt: DateTime
+        +updatedAt: DateTime
+    }
+
+    class Supplier {
+        +id: Int
+        +name: String
+        +contactPerson: String
+        +email: String
+        +phone: String
+        +address: String
+        +createdAt: DateTime
+        +updatedAt: DateTime
+    }
+
+    class InventoryTransaction {
+        +id: Int
+        +productId: Int
+        +transactionType: String
+        +quantity: Int
+        +referenceId: Int
+        +referenceType: String
+        +userId: Int
+        +notes: String
+        +createdAt: DateTime
+    }
+
+    class AuditLog {
+        +id: Int
+        +userId: Int
+        +action: String
+        +tableName: String
+        +recordId: Int
+        +oldValues: Json
+        +newValues: Json
+        +ipAddress: String
+        +createdAt: DateTime
+    }
+
+    User "*" -- "1" Role : has
+    Role "*" -- "*" Permission : has
+    Product "*" -- "1" Category : belongsTo
+    Product "*" -- "1" Supplier : suppliedBy
+    Product "1" -- "*" InventoryTransaction : has
+    User "1" -- "*" InventoryTransaction : creates
+    User "1" -- "*" AuditLog : generates
+```
+
+<antArtifact identifier="use-case-diagram" type="application/vnd.ant.mermaid" title="System Use Case Diagram">
+```mermaid
+graph TB
+    subgraph Actors
+        Admin[Admin]
+        User[Regular User]
+    end
+
+    subgraph Authentication
+        Login[Login]
+        Logout[Logout]
+        ManageUsers[Manage Users]
+    end
+
+    subgraph Inventory Management
+        AddProduct[Add Product]
+        EditProduct[Edit Product]
+        DeleteProduct[Delete Product]
+        ViewInventory[View Inventory]
+        ImportProducts[Import Products]
+        ExportProducts[Export Products]
+        ManageCategories[Manage Categories]
+        ManageSuppliers[Manage Suppliers]
+        TrackStock[Track Stock Levels]
+    end
+
+    subgraph System Features
+        GenerateReports[Generate Reports]
+        ViewAuditLogs[View Audit Logs]
+        ManageSettings[Manage Settings]
+    end
+
+    Admin --> Login
+    User --> Login
+    Admin --> ManageUsers
+    Admin --> ManageSettings
+    Admin --> ViewAuditLogs
+    
+    Admin & User --> ViewInventory
+    Admin & User --> AddProduct
+    Admin & User --> EditProduct
+    Admin --> DeleteProduct
+    Admin & User --> ImportProducts
+    Admin & User --> ExportProducts
+    Admin --> ManageCategories
+    Admin --> ManageSuppliers
+    Admin & User --> TrackStock
+    Admin & User --> GenerateReports
+    Admin & User --> Logout
+```
+
+### System Overview
+
+1. **Authentication System**
+   - JWT-based authentication
+   - Role-based access control (RBAC)
+   - Secure password hashing with bcrypt
+   - HTTP-only cookie session management
+   - 8-hour session duration
+
+2. **Directory Structure**
+```
+winehouse-inventory-pos/
+├── app/
+│   ├── api/
+│   │   ├── auth/
+│   │   ├── inventory/
+│   │   ├── categories/
+│   │   └── suppliers/
+│   ├── components/
+│   │   ├── layout/
+│   │   ├── inventory/
+│   │   └── shared/
+│   ├── context/
+│   ├── hooks/
+│   ├── lib/
+│   └── styles/
+├── prisma/
+└── public/
+```
+
+3. **Key Features**
+
+   a. **Authentication & Authorization**
+   - Login system with JWT tokens
+   - Role-based access control
+   - Protected routes
+   - Audit logging
+
+   b. **Inventory Management**
+   - Product CRUD operations
+   - Barcode support
+   - Stock level tracking
+   - Category management
+   - Supplier management
+   - Batch import/export
+   - Stock history tracking
+
+   c. **User Interface**
+   - Responsive design
+   - Dark/light theme support
+   - Advanced AG Grid implementation
+   - Material-UI components
+   - Form and upload options for adding products
+   - Interactive data tables
+   - Real-time search and filtering
+
+4. **Database Schema**
+
+   a. **User Management Tables**
+   - users
+   - roles
+   - permissions
+   - role_permissions
+
+   b. **Inventory Tables**
+   - products
+   - categories
+   - suppliers
+   - inventory_transactions
+
+   c. **Audit Tables**
+   - audit_logs
+   - settings
+
+5. **Technical Stack**
+   - Frontend: Next.js 13+ (App Router)
+   - UI: Material-UI, AG Grid Community
+   - Database: MySQL with Prisma ORM
+   - Authentication: JWT with HTTP-only cookies
+   - File Processing: XLSX for imports
+
+6. **Components Breakdown**
+
+   a. **Layout Components**
+   - Navigation system with collapsible sidebar
+   - Theme toggle
+   - Responsive header
+
+   b. **Inventory Components**
+   - ProductFormModal for single product addition
+   - ProductUploadModal for batch imports
+   - DeleteConfirmModal for confirmations
+   - StatusBarComponent for grid statistics
+   - Custom cell renderers for AG Grid
+
+   c. **Shared Components**
+   - SnackbarProvider for notifications
+   - ThemeProvider for dark/light mode
+   - LoadingProvider for loading states
+
+7. **Security Features**
+   - Password hashing
+   - JWT token management
+   - Protected API routes
+   - RBAC implementation
+   - Audit logging
+   - Input validation
+   - XSS protection
+   - CSRF protection
+
+8. **Data Management**
+   - Optimistic updates
+   - Batch processing
+   - Real-time filtering
+   - Data export capabilities
+   - Transaction logging
+   - Stock history tracking
+
+9. **UI/UX Features**
+   - Responsive design
+   - Mobile-first approach
+   - Advanced filtering
+   - Sort capabilities
+   - Batch operations
+   - Excel import/export
+   - Theme switching
+   - Interactive notifications
+
+10. **API Endpoints**
+    - Authentication routes
+    - Inventory management routes
+    - User management routes
+    - Category management routes
+    - Supplier management routes
+    - Report generation routes
+
+Would you like me to:
+1. Add more detail to any section?
+2. Create additional diagrams?
+3. Expand on specific features?
+4. Add implementation guidelines?
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
