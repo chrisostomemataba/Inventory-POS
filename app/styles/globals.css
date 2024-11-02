@@ -1,0 +1,112 @@
+/* app/globals.css */
+@import '@fontsource/inter/300.css';
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/inter/700.css';
+@import '@fontsource/playfair-display/700.css';
+@import '@fontsource/playfair-display/600.css';
+
+:root {
+  --primary-color: #7C3AED;
+  --primary-light: #9D65FF;
+  --primary-dark: #6023DD;
+  --text-primary: #1A1B1E;
+  --text-secondary: #4B5563;
+  --background-light: #F8F9FC;
+  --background-dark: #1A1B1E;
+  --transition-base: all 0.2s ease-in-out;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease;
+}
+
+/* Placeholder styling */
+::placeholder {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  opacity: 0.7;
+  font-size: 0.95rem;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 4px;
+}
+
+/* Animation classes */
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.slide-up {
+  transform: translateY(20px);
+  opacity: 0;
+  animation: slideUp 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Form elements focus states */
+input:focus, 
+button:focus,
+a:focus {
+  outline: 2px solid var(--primary-light);
+  outline-offset: 2px;
+}
+
+/* app/globals.css */
+/* Add these CSS custom properties after your existing ones */
+[data-theme='light'] {
+  --background-primary: var(--background-light);
+  --text-primary: var(--text-primary-light);
+  --text-secondary: var(--text-secondary-light);
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --background-primary: var(--background-dark);
+  --text-primary: var(--text-primary-dark);
+  --text-secondary: var(--text-secondary-dark);
+  color-scheme: dark;
+}
+
+/* Add theme transition for smooth theme switching */
+body * {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}

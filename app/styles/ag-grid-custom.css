@@ -1,0 +1,46 @@
+.ag-theme-material.dark,
+.ag-theme-material-dark {
+  --ag-background-color: #1a1b1e;
+  --ag-border-color: rgba(255, 255, 255, 0.12);
+  --ag-secondary-border-color: rgba(255, 255, 255, 0.08);
+  --ag-header-background-color: #2a2b2f;
+  --ag-odd-row-background-color: rgba(255, 255, 255, 0.02);
+  --ag-control-panel-background-color: #2a2b2f;
+  --ag-row-hover-color: rgba(124, 58, 237, 0.15);
+  --ag-column-hover-color: rgba(124, 58, 237, 0.1);
+  --ag-input-focus-border-color: #7c3aed;
+}
+
+.ag-header-cell-custom {
+  font-weight: 600 !important;
+  color: var(--ag-header-foreground-color) !important;
+}
+
+.ag-row-custom {
+  transition: all 0.2s ease;
+}
+
+.ag-row-custom:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ag-cell-focus {
+  border-color: var(--ag-input-focus-border-color) !important;
+}
+
+.ag-overlay-loading-center {
+  background-color: var(--ag-background-color) !important;
+  border: none !important;
+  border-radius: 8px;
+  padding: 24px !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.ag-floating-filter-input {
+  margin-top: 4px !important;
+}
+
+.ag-row-selected {
+  border-left: 3px solid var(--ag-input-focus-border-color) !important;
+}

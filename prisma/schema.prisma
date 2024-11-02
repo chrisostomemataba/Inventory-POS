@@ -1,0 +1,335 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?   @db.Text
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  users       User[]
+  permissions RolePermission[]
+
+  @@map("roles")
+}
+
+model InventoryTransaction {
+  id              Int      @id @default(autoincrement())
+  productId       Int
+  transactionType String   // IN or OUT
+  quantity        Int
+  previousStock   Int
+  newStock        Int
+  notes           String?
+  userId          Int
+  createdAt       DateTime @default(now())
+  product         Product  @relation(fields: [productId], references: [id])
+  user            User     @relation(fields: [userId], references: [id])
+}
+
+model Permission {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?   @db.Text
+  createdAt   DateTime  @default(now()) @map("created_at")
+  roles       RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       Int      @map("role_id")
+  permissionId Int      @map("permission_id")
+  role         Role     @relation(fields: [roleId], references: [id])
+  permission   Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  username     String    @unique
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  fullName     String    @map("full_name")
+  phoneNumber  String?   @map("phone_number")
+  roleId       Int       @map("role_id")
+  isActive     Boolean   @default(true) @map("is_active")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  role         Role      @relation(fields: [roleId], references: [id])
+  sales        Sale[]
+  purchases    PurchaseOrder[]
+  inventory    InventoryTransaction[]
+  auditLogs    AuditLog[]
+  shifts       Shift[]
+
+  @@map("users")
+}
+
+model Category {
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String?    @db.Text
+  parentId    Int?       @map("parent_id")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+  parent      Category?  @relation("CategoryToCategory", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryToCategory")
+  products    Product[]
+
+  @@map("categories")
+}
+
+model Supplier {
+  id            Int       @id @default(autoincrement())
+  name          String
+  contactPerson String?   @map("contact_person")
+  email         String?
+  phone         String?
+  address       String?   @db.Text
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  products      Product[]
+  purchases     PurchaseOrder[]
+
+  @@map("suppliers")
+}
+
+model Product {
+  id              Int       @id @default(autoincrement())
+  categoryId      Int       @map("category_id")
+  name            String
+  description     String?   @db.Text
+  barcode         String?   @unique
+  sku             String?   @unique
+  unitPrice       Decimal   @map("unit_price") @db.Decimal(10, 2)
+  costPrice       Decimal   @map("cost_price") @db.Decimal(10, 2)
+  quantity        Int       @default(0)
+  minimumQuantity Int       @default(0) @map("minimum_quantity")
+  maximumQuantity Int?      @map("maximum_quantity")
+  supplierId      Int?      @map("supplier_id")
+  imageUrl        String?   @map("image_url")
+  isActive        Boolean   @default(true) @map("is_active")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  category        Category  @relation(fields: [categoryId], references: [id])
+  supplier        Supplier? @relation(fields: [supplierId], references: [id])
+  saleItems       SaleItem[]
+  purchaseItems   PurchaseOrderItem[]
+  inventory       InventoryTransaction[]
+
+  @@map("products")
+}
+
+model PurchaseOrder {
+  id            Int       @id @default(autoincrement())
+  supplierId    Int       @map("supplier_id")
+  userId        Int       @map("user_id")
+  orderDate     DateTime  @map("order_date")
+  expectedDate  DateTime? @map("expected_date")
+  status        String    @default("pending")
+  totalAmount   Decimal   @map("total_amount") @db.Decimal(10, 2)
+  notes         String?   @db.Text
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  supplier      Supplier  @relation(fields: [supplierId], references: [id])
+  user          User      @relation(fields: [userId], references: [id])
+  items         PurchaseOrderItem[]
+
+  @@map("purchase_orders")
+}
+
+model PurchaseOrderItem {
+  id              Int           @id @default(autoincrement())
+  purchaseOrderId Int           @map("purchase_order_id")
+  productId       Int           @map("product_id")
+  quantity        Int
+  unitPrice       Decimal       @map("unit_price") @db.Decimal(10, 2)
+  totalPrice      Decimal       @map("total_price") @db.Decimal(10, 2)
+  receivedQuantity Int          @default(0) @map("received_quantity")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id])
+  product         Product       @relation(fields: [productId], references: [id])
+
+  @@map("purchase_order_items")
+}
+
+model InventoryTransaction {
+  id              Int       @id @default(autoincrement())
+  productId       Int       @map("product_id")
+  transactionType String    @map("transaction_type")
+  quantity        Int
+  referenceId     Int?      @map("reference_id")
+  referenceType   String?   @map("reference_type")
+  userId          Int       @map("user_id")
+  notes           String?   @db.Text
+  createdAt       DateTime  @default(now()) @map("created_at")
+  product         Product   @relation(fields: [productId], references: [id])
+  user            User      @relation(fields: [userId], references: [id])
+
+  @@map("inventory_transactions")
+}
+
+model Customer {
+  id           Int       @id @default(autoincrement())
+  name         String
+  email        String?   @unique
+  phone        String?
+  address      String?   @db.Text
+  loyaltyPoints Int      @default(0) @map("loyalty_points")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  sales        Sale[]
+
+  @@map("customers")
+}
+
+model PaymentMethod {
+  id                  Int       @id @default(autoincrement())
+  name                String
+  isActive            Boolean   @default(true) @map("is_active")
+  requiresVerification Boolean  @default(false) @map("requires_verification")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+  sales               Sale[]
+
+  @@map("payment_methods")
+}
+
+model Sale {
+  id              Int       @id @default(autoincrement())
+  customerId      Int?      @map("customer_id")
+  userId          Int       @map("user_id")
+  saleDate        DateTime  @default(now()) @map("sale_date")
+  subtotal        Decimal   @db.Decimal(10, 2)
+  taxAmount       Decimal   @default(0) @map("tax_amount") @db.Decimal(10, 2)
+  discountAmount  Decimal   @default(0) @map("discount_amount") @db.Decimal(10, 2)
+  totalAmount     Decimal   @map("total_amount") @db.Decimal(10, 2)
+  paymentStatus   String    @default("pending")
+  paymentMethodId Int?      @map("payment_method_id")
+  receiptNumber   String?   @unique @map("receipt_number")
+  notes           String?   @db.Text
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  customer        Customer? @relation(fields: [customerId], references: [id])
+  user            User      @relation(fields: [userId], references: [id])
+  paymentMethod   PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
+  items           SaleItem[]
+  payments        PaymentTransaction[]
+
+  @@map("sales")
+}
+
+model SaleItem {
+  id          Int       @id @default(autoincrement())
+  saleId      Int       @map("sale_id")
+  productId   Int       @map("product_id")
+  quantity    Int
+  unitPrice   Decimal   @map("unit_price") @db.Decimal(10, 2)
+  discount    Decimal   @default(0) @db.Decimal(10, 2)
+  totalPrice  Decimal   @map("total_price") @db.Decimal(10, 2)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  sale        Sale      @relation(fields: [saleId], references: [id])
+  product     Product   @relation(fields: [productId], references: [id])
+
+  @@map("sale_items")
+}
+
+model PaymentTransaction {
+  id                  Int       @id @default(autoincrement())
+  saleId              Int       @map("sale_id")
+  amount              Decimal   @db.Decimal(10, 2)
+  paymentMethod       String    @map("payment_method")
+  transactionReference String?  @map("transaction_reference")
+  status              String
+  gatewayResponse     String?   @db.Text @map("gateway_response")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  sale                Sale      @relation(fields: [saleId], references: [id])
+
+  @@map("payment_transactions")
+}
+
+model Account {
+  id            Int       @id @default(autoincrement())
+  accountNumber String    @unique @map("account_number")
+  name          String
+  type          String
+  balance       Decimal   @default(0) @db.Decimal(10, 2)
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  transactions  Transaction[]
+
+  @@map("accounts")
+}
+
+model Transaction {
+  id              Int       @id @default(autoincrement())
+  accountId       Int       @map("account_id")
+  transactionType String    @map("transaction_type")
+  amount          Decimal   @db.Decimal(10, 2)
+  referenceId     Int?      @map("reference_id")
+  referenceType   String?   @map("reference_type")
+  description     String?   @db.Text
+  transactionDate DateTime  @map("transaction_date")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  account         Account   @relation(fields: [accountId], references: [id])
+
+  @@map("transactions")
+}
+
+model AuditLog {
+  id          Int       @id @default(autoincrement())
+  userId      Int       @map("user_id")
+  action      String
+  tableName   String    @map("table_name")
+  recordId    Int?      @map("record_id")
+  oldValues   Json?     @map("old_values")
+  newValues   Json?     @map("new_values")
+  ipAddress   String?   @map("ip_address")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
+
+model Setting {
+  id          Int       @id @default(autoincrement())
+  key         String    @unique
+  value       String?   @db.Text
+  description String?   @db.Text
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@map("settings")
+}
+
+model Shift {
+  id           Int       @id @default(autoincrement())
+  userId       Int       @map("user_id")
+  startTime    DateTime  @map("start_time")
+  endTime      DateTime? @map("end_time")
+  cashInHand   Decimal   @map("cash_in_hand") @db.Decimal(10, 2)
+  cashOut      Decimal?  @map("cash_out") @db.Decimal(10, 2)
+  notes        String?   @db.Text
+  status       String
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  user         User      @relation(fields: [userId], references: [id])
+
+  @@map("shifts")
+}

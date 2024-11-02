@@ -1,0 +1,53 @@
+{
+  "name": "winehouse-inventory",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@fontsource/inter": "^5.1.0",
+    "@fontsource/playfair-display": "^5.1.0",
+    "@headlessui/react": "^2.2.0",
+    "@heroicons/react": "^2.1.5",
+    "@mui/icons-material": "^6.1.5",
+    "@mui/lab": "6.0.0-beta.13",
+    "@mui/material": "^6.1.5",
+    "@mui/x-data-grid": "^7.22.0",
+    "@mui/x-date-pickers": "^7.22.0",
+    "@prisma/client": "^5.21.1",
+    "@react-pdf/renderer": "^4.0.0",
+    "ag-grid-community": "^32.3.1",
+    "ag-grid-react": "^32.3.1",
+    "axios": "^1.7.7",
+    "bcryptjs": "^2.4.3",
+    "date-fns": "^4.1.0",
+    "framer-motion": "^11.11.10",
+    "jsonwebtoken": "^9.0.2",
+    "next": "15.0.1",
+    "next-auth": "^4.24.10",
+    "next-themes": "^0.3.0",
+    "react": "19.0.0-rc-69d4b800-20241021",
+    "react-barcode": "^1.5.3",
+    "react-barcode-reader": "^0.0.2",
+    "react-dom": "19.0.0-rc-69d4b800-20241021",
+    "react-hook-form": "^7.53.1",
+    "react-query": "^3.39.3",
+    "recharts": "^2.13.3",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "eslint": "^8",
+    "eslint-config-next": "15.0.1",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  }
+}
