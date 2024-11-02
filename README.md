@@ -26,7 +26,7 @@ To learn more about Next.js, take a look at the following resources:
 
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
 
-- ```mermaid
+  
 classDiagram
     class User {
         +id: Int
@@ -321,11 +321,7 @@ winehouse-inventory-pos/
     - Supplier management routes
     - Report generation routes
 
-Would you like me to:
-1. Add more detail to any section?
-2. Create additional diagrams?
-3. Expand on specific features?
-4. Add implementation guidelines?
+
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
